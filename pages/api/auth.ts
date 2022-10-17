@@ -44,7 +44,9 @@ export default async function handler(
 
   // process
   if(req.body.type === 'auth') {
+    // @ts-ignore
     const initRes = await page.evaluate( initResFunc );
+    // @ts-ignore
     const authRes = await page.evaluate( authResFunc, req.body.username, req.body.password);
 
     if(authRes.status !== 200) {
@@ -109,6 +111,7 @@ export default async function handler(
   } else if(req.body.type === 'multifactor') {
     const cookies = await JSON.parse(req.body.previousSession);
     await page.setCookie(...cookies);
+    // @ts-ignore
     const multiRes = await page.evaluate(multiResFunc, req.body.code);
 
     if(multiRes.status !== 200) {
