@@ -11,8 +11,14 @@ export default function handler(
     `refresh='${Date.now()}'; Path=/; Max-Age=0; HttpOnly; SameSite=Strict;`
   ]);
   res.status(200).send(`
+  <!doctype html>
+  <html>
     <head>
       <meta http-equiv="refresh" content="0;URL='/'" />
     </head>
+    <body>
+      <div>${Date.now()}</div>
+    </body>
+  </html>
   `);
 }
