@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { GetRiotTokenFromURI } from '../../utility';
+import { KnownDevices } from 'puppeteer';
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,23 +22,23 @@ export default async function handler(
   let browser;
 
   if(process.env.VERCEL === '1') {// on vercel ecosystem
-    const chromium = (await import('chrome-aws-lambda')).default;
-    browser = await chromium.puppeteer.launch({
+    const puppeteer = (await import('puppeteer-core')).default;
+    const chromium = (await import('@sparticuz/chromium-min')).default;
+    browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath,
+      executablePath: await chromium.executablePath(`https://${process.env.VERCEL_URL}/chromium-v114.0.0-pack.tar`),
       headless: chromium.headless,
       ignoreHTTPSErrors: true,
     });
-
   } else {// on other ecosystem
     const puppeteer = (await import('puppeteer'));
     browser = await puppeteer.launch({
-      // headless: false
+      headless: 'new'
     });
   }
 
-  const device = (await import('puppeteer')).devices['iPhone 6'];
+  const device = KnownDevices['iPhone 6'];
   const page = await browser.newPage();
   await page.emulate(device);
   await page.goto('https://auth.riotgames.com/api/v1/authorization');
