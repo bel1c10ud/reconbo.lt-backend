@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { GetRiotTokenFromURI } from '../../utility';
-import { KnownDevices } from 'puppeteer';
+import { KnownDevices } from 'puppeteer-core';
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,7 +32,7 @@ export default async function handler(
       ignoreHTTPSErrors: true,
     });
   } else {// on other ecosystem
-    const puppeteer = (await import('puppeteer'));
+    const puppeteer = (await import('puppeteer')).default;
     browser = await puppeteer.launch({
       headless: 'new'
     });
@@ -54,14 +54,14 @@ export default async function handler(
       if(authRes.status === 429 && authRes.headers['retry-after']) {
         res.setHeader('Retry-After', authRes.headers['retry-after']);
         return res.status(429).send({ 
-          type: 'error', 
-          message: `Authorization API Error: ${authRes.data.error ?? authRes.data.message ?? 'unkown'}`, 
+          type: 'error',
+          message: `Authorization API Error: ${[authRes.data.error?? 'unknown_error', authRes.data.message].filter(e => e).join(', ')}`, 
           authorization_response: authRes.data 
         })
       } else {
         return res.status(authRes.status).send({ 
-          type: 'error', 
-          message: `Authorization API Error: ${authRes.data.error ?? authRes.data.message ?? 'unkown'}`, 
+          type: 'error',
+          message: `Authorization API Error: ${[authRes.data.error?? 'unknown_error', authRes.data.message].filter(e => e).join(', ')}`,
           authorization_response: authRes.data 
         });
       }
@@ -106,7 +106,11 @@ export default async function handler(
       })
     } else {
       // error
-      return res.status(400).send({ type: 'error', message: 'Authorization API Error: Invalid response type'})
+      return res.status(400).send({ 
+        type: 'error', 
+        message: `Authorization API Error: ${[authRes.data.error?? 'unknown_error', authRes.data.message].filter(e => e).join(', ')}`, 
+        authorization_response: authRes.data 
+      })
     }
 
   } else if(req.body.type === 'multifactor') {
@@ -120,13 +124,13 @@ export default async function handler(
         res.setHeader('Retry-After', multiRes.headers['retry-after']);
         return res.status(429).send({ 
           type: 'error', 
-          message: `Multifactor API Error: ${multiRes.data.error ?? multiRes.data.message ?? 'unkown'}`, 
+          message: `Multifactor API Error: ${[multiRes.data.error?? 'unknown_error', multiRes.data.message].filter(e => e).join(', ')}`, 
           multifactor_response: multiRes.data 
         })
       } else {
         return res.status(multiRes.status).send({ 
           type: 'error', 
-          message: `Multifactor API Error: ${multiRes.data.error ?? multiRes.data.message ?? 'unkown'}`, 
+          message: `Multifactor API Error: ${[multiRes.data.error?? 'unknown_error', multiRes.data.message].filter(e => e).join(', ')}`, 
           multifactor_response: multiRes.data 
         });
       }
@@ -203,14 +207,12 @@ async function initResFunc() {
       Headers: {},
       data: { 
         type: 'error',
-        error: 'Initialization Error: request fail', 
-        message: 'Initialization Error: request fail' 
+        error: 'Initialization Error: request_fail', 
+        message: 'Initialization Error: request_fail' 
       },
       error: error
     }
   }
-
-
 }
 
 async function authResFunc(username: string, password: string) {
@@ -250,14 +252,12 @@ async function authResFunc(username: string, password: string) {
       Headers: {},
       data: { 
         type: 'error',
-        error: 'Authorization Error: request fail', 
-        message: 'Authorization Error: request fail' 
+        error: 'Authorization Error: request_fail', 
+        message: 'Authorization Error: request_fail' 
       },
       error: error
     }
   }
-
-  
 }
 
 async function multiResFunc(code: string) {
@@ -297,12 +297,10 @@ async function multiResFunc(code: string) {
       Headers: {},
       data: { 
         type: 'error',
-        error: 'Multifcator Error: request fail', 
-        message: 'Multifcator Error: request fail' 
+        error: 'Multifcator Error: request_fail', 
+        message: 'Multifcator Error: request_fail' 
       },
       error: error
     }
   }
-
-  
 }
