@@ -27,14 +27,14 @@ export default async function handler(
     browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(`https://${process.env.VERCEL_URL}/chromium-v114.0.0-pack.tar`),
+      executablePath: await chromium.executablePath(`https://${process.env.VERCEL_URL}/chromium-v123.0.1-pack.tar`),
       headless: chromium.headless,
       ignoreHTTPSErrors: true,
     });
   } else {// on other ecosystem
     const puppeteer = (await import('puppeteer')).default;
     browser = await puppeteer.launch({
-      headless: 'new'
+      headless: true
     });
   }
 
