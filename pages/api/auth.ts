@@ -36,10 +36,9 @@ export default async function handler(
             args: chromium.args,
             defaultViewport: chromium.defaultViewport,
             executablePath: await chromium.executablePath(
-              `https://${process.env.VERCEL_URL}/chromium-v123.0.1-pack.tar`
+              `https://${process.env.VERCEL_URL}/chromium-v131.0.1-pack.tar`
             ),
-            headless: chromium.headless,
-            ignoreHTTPSErrors: true,
+            headless: chromium.headless
           });
         })();
 

@@ -10,10 +10,10 @@
     "prepare": "husky install && bash ./prepare.sh"
   },
   "dependencies": {
-    "@sparticuz/chromium-min": "^123.0.1",
+    "@sparticuz/chromium-min": "^131.0.1",
     "next": "14.2.10",
-    "puppeteer": "^22.6.4",
-    "puppeteer-core": "^22.6.4",
+    "puppeteer": "^23.10.4",
+    "puppeteer-core": "^23.10.4",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
@@ -23,7 +23,7 @@
     "@types/react-dom": "18.0.6",
     "eslint": "8.24.0",
     "eslint-config-next": "12.3.1",
-    "typescript": "4.8.3",
-    "husky": "^8.0.0"
+    "husky": "^8.0.0",
+    "typescript": "4.8.3"
   }
 }
