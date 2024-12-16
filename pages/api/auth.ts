@@ -19,24 +19,29 @@ export default async function handler(
   }
 
   // browser branch
-  let browser;
+  const browser =
+    process.env.VERCEL_ENV === "development"
+      ? await(async () => {
+          const puppeteer = (await import("puppeteer")).default;
 
-  if(process.env.VERCEL === '1') {// on vercel ecosystem
-    const puppeteer = (await import('puppeteer-core')).default;
-    const chromium = (await import('@sparticuz/chromium-min')).default;
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(`https://${process.env.VERCEL_URL}/chromium-v123.0.1-pack.tar`),
-      headless: chromium.headless,
-      ignoreHTTPSErrors: true,
-    });
-  } else {// on other ecosystem
-    const puppeteer = (await import('puppeteer')).default;
-    browser = await puppeteer.launch({
-      headless: true
-    });
-  }
+          return await puppeteer.launch({
+            headless: true,
+          });
+        })()
+      : await(async () => {
+          const puppeteer = (await import("puppeteer-core")).default;
+          const chromium = (await import("@sparticuz/chromium-min")).default;
+
+          return await puppeteer.launch({
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(
+              `${process.cwd()}/public/chromium-v123.0.1`
+            ),
+            headless: chromium.headless,
+            ignoreHTTPSErrors: true,
+          });
+        })();
 
   const device = KnownDevices['iPhone 6'];
   const page = await browser.newPage();
@@ -45,7 +50,7 @@ export default async function handler(
 
   // process
   if(req.body.type === 'auth') {
-    // @ts-ignore
+    // @ts-ignore 
     const initRes = await page.evaluate( initResFunc );
     // @ts-ignore
     const authRes = await page.evaluate( authResFunc, req.body.username, req.body.password);
